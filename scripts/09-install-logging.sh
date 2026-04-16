@@ -3,6 +3,9 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 echo "========================================="
 echo "K8s DevOps - 安装日志组件 (Loki)"
 echo "========================================="
@@ -12,34 +15,11 @@ echo "添加 Loki 仓库..."
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
-# 创建 logging namespace（如果没有）
-kubectl create namespace logging || true
-
 # 安装 Loki
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-mkdir -p $PROJECT_DIR/manifests/logging
-
-cat > $PROJECT_DIR/manifests/logging/loki-values.yaml <<EOF
-loki:
-  persistence:
-    enabled: true
-    storageClassName: nfs-storage
-    size: 10Gi
-
-promtail:
-  enabled: true
-  config:
-    logLevel: info
-    serverPort: 3101
-    clients:
-      - url: http://loki:3100/loki/api/v1/push
-EOF
-
 echo "安装 Loki..."
 helm upgrade --install loki grafana/loki \
   -n logging \
-  -f $PROJECT_DIR/manifests/logging/loki-values.yaml \
+  -f $PROJECT_DIR/manifests/logging/values.yaml \
   --create-namespace
 
 # 等待 Loki 就绪
@@ -55,10 +35,5 @@ echo "Loki 日志系统安装完成!"
 echo "========================================="
 kubectl get pods -n logging
 echo ""
-echo "Loki 地址: http://loki.logging:3100"
-echo ""
 echo "在 Grafana 中添加 Loki 数据源:"
 echo "URL: http://loki.logging:3100"
-echo ""
-echo "所有组件安装完成!"
-echo "下一步: 运行 10-deploy-sample-app.sh 部署示例应用"

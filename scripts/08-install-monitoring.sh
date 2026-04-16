@@ -4,6 +4,9 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 echo "========================================="
 echo "K8s DevOps - 安装监控组件"
 echo "========================================="
@@ -13,55 +16,11 @@ echo "添加 Prometheus 仓库..."
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-# 创建 monitoring namespace
-kubectl create namespace monitoring || true
-
-# 创建 Grafana 配置
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-mkdir -p $PROJECT_DIR/manifests/monitoring
-
-cat > $PROJECT_DIR/manifests/monitoring/grafana-config.yaml <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-config
-  namespace: monitoring
-data:
-  grafana.ini: |
-    [server]
-    domain = grafana.local
-    root_url = http://grafana.local
-EOF
-
+# 部署 Grafana 配置
+echo "部署 Grafana 配置..."
 kubectl apply -f $PROJECT_DIR/manifests/monitoring/grafana-config.yaml
 
 # 安装 kube-prometheus-stack
-cat > $PROJECT_DIR/manifests/monitoring/kube-prometheus-stack.yaml <<EOF
-prometheus:
-  prometheusSpec:
-    retention: 15d
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: nfs-storage
-          resources:
-            requests:
-              storage: 10Gi
-
-grafana:
-  adminPassword: admin123
-  persistence:
-    enabled: true
-    storageClassName: nfs-storage
-    size: 5Gi
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - grafana.local
-EOF
-
 echo "安装 kube-prometheus-stack..."
 helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   -n monitoring \
@@ -69,14 +28,7 @@ helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheu
   --create-namespace
 
 # 等待监控组件就绪
-echo "等待监控组件就绪..."
-kubectl wait --namespace monitoring \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/name=kube-prometheus-stack \
-  --timeout=300s || true
-
-# 等待所有 Pod 就绪
-echo "等待所有 Pod 就绪..."
+echo "等待 Pod 就绪..."
 kubectl wait --namespace monitoring \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=prometheus \
@@ -89,9 +41,5 @@ echo "========================================="
 kubectl get pods -n monitoring
 echo ""
 echo "Grafana 地址: http://grafana.local"
-echo "Grafana 账号: admin"
-echo "Grafana 密码: admin123"
-echo ""
-echo "Prometheus 地址: http://prometheus.monitoring:9090"
-echo ""
-echo "下一步: 运行 09-install-logging.sh"
+echo "用户名: admin"
+echo "密码: admin123"

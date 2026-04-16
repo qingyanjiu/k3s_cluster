@@ -1,4 +1,5 @@
 controller:
+  image: jenkins/jenkins:lts-jdk17
   imagePullPolicy: IfNotPresent
 
   resources:
@@ -13,9 +14,8 @@ controller:
     storageClass: nfs-storage
     size: 10Gi
 
-  admin:
-    user: admin
-    password: admin123
+  adminUser: admin
+  adminPassword: admin123
 
   javaOpts: "-Djenkins.install.runSetupWizard=false"
 
@@ -25,6 +25,8 @@ controller:
     hostName: jenkins.local
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+
+  disableRememberMe: false
 
 agent:
   enabled: true
@@ -36,3 +38,5 @@ installPlugins:
   - configuration-as-code
   - blueocean
   - docker-workflow
+  - maven
+  - nodejs

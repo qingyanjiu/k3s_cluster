@@ -1,18 +1,4 @@
 loki:
-  auth_enabled: false
-  server:
-    http_listen_port: 3100
-  storage:
-    type: filesystem
-  schemaConfig:
-    configs:
-      - from: 2020-09-07
-        index:
-          prefix: index_
-          period: 24h
-        object_store: filesystem
-        store: boltdb-shipper
-        schema: v11
   persistence:
     enabled: true
     storageClassName: nfs-storage
