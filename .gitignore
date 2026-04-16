@@ -1,0 +1,41 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+nohup.out
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Certificates and secrets (uncomment if needed)
+# *.pem
+# *.key
+# *.crt
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+*.tgz
+
+# Helm
+.helm/
+*-values.yaml
+
+# Docker data
+/data/
+
+# Kuboard (local testing)
+.config/
