@@ -4,13 +4,16 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 echo "========================================="
 echo "K8s DevOps - 安装 Ingress Nginx"
 echo "========================================="
 
 # 安装 Ingress Nginx Controller
 echo "安装 Ingress Nginx Controller..."
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.4/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f $PROJECT_DIR/manifests/ingress-nginx/ingress-nginx.yaml
 
 # 等待 Ingress Controller 就绪
 echo "等待 Ingress Controller 就绪..."

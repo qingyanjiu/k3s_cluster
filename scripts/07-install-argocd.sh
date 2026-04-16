@@ -3,6 +3,9 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 echo "========================================="
 echo "K8s DevOps - 安装 ArgoCD"
 echo "========================================="
@@ -12,7 +15,7 @@ kubectl create namespace argocd || true
 
 # 安装 ArgoCD
 echo "安装 ArgoCD..."
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
+kubectl apply -n argocd -f $PROJECT_DIR/manifests/argocd/install.yaml
 
 # 等待 ArgoCD 就绪
 echo "等待 ArgoCD 就绪..."
@@ -22,35 +25,7 @@ kubectl wait --namespace argocd \
   --timeout=180s
 
 # 创建 Ingress
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-mkdir -p $PROJECT_DIR/manifests/argocd
-
-cat > $PROJECT_DIR/manifests/argocd/argocd-ingress.yaml <<EOF
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: argocd-ingress
-  namespace: argocd
-  annotations:
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: argocd.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: argocd-server
-            port:
-              number: 443
-EOF
-
-kubectl apply -f $PROJECT_DIR/manifests/argocd/argocd-ingress.yaml
+kubectl apply -f $PROJECT_DIR/manifests/argocd/ingress.yaml
 
 # 获取初始密码
 ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)

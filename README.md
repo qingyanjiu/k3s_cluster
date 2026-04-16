@@ -27,9 +27,14 @@ k3s_cluster/
     │   └── java-service.yaml   # Java 后端服务
     ├── services/
     │   └── nodeport-services.yaml  # NodePort 访问配置
+    ├── ingress-nginx/
+    │   └── ingress-nginx.yaml  # Ingress Nginx Controller 配置
     ├── kuboard/
+    │   ├── kuboard-v3.yaml     # Kuboard 主配置
+    │   ├── kuboard-v3-swr.yaml # Kuboard SWR 镜像版本
     │   └── kuboard-ingress.yaml    # Kuboard Ingress
     ├── argocd/
+    │   ├── install.yaml        # ArgoCD 完整安装包
     │   └── ingress.yaml        # ArgoCD Ingress
     ├── monitoring/
     │   ├── kube-prometheus-stack.yaml  # Prometheus + Grafana 配置
