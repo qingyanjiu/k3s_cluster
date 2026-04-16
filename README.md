@@ -222,7 +222,7 @@ bash scripts/update-hosts.sh 192.168.0.122
 | **Jenkins** | http://jenkins.local | admin | admin123 | CI/CD 流水线 |
 | **ArgoCD** | https://argocd.local | admin | (见下方) | GitOps 交付 |
 | **Grafana** | http://grafana.local | admin | admin123 | 监控可视化 |
-| **Kuboard** | http://kuboard.local:30083 | admin | Kuboard123 | K8s 可视化管理 |
+| **Kuboard** | http://kuboard.local | admin | Kuboard123 | K8s 可视化管理 |
 | **示例应用** | http://app.local | - | - | Vue 前端演示 |
 
 ### 各服务详细说明
@@ -267,55 +267,60 @@ bash scripts/update-hosts.sh 192.168.0.122
 
 ##### 安装方式
 
-支持 **Docker** 和 **K8s** 两种安装方式。
-
-| 方式 | 安装命令 | 访问地址 | 说明 |
-|------|----------|----------|------|
-| Docker | `bash 11-install-kuboard.sh docker` | http://kuboard.local:30083 | 独立容器，推荐用于测试/开发 |
-| K8s | `bash 11-install-kuboard.sh k8s` | http://kuboard.local | 部署在集群中，适合生产环境 |
+使用 **K8s 方式**部署，通过 Ingress 或 NodePort 访问。
 
 ```bash
-# Docker 方式（默认，推荐用于单机 K3s）
-bash 11-install-kuboard.sh docker
+# 安装 Kuboard
+bash 11-install-kuboard.sh
 
-# K8s 方式（适合多节点集群）
-bash 11-install-kuboard.sh k8s
+# 自定义端口（可选，默认 30083）
+KUBOARD_WEB_PORT=30085 bash 11-install-kuboard.sh
+```
+
+##### 配置文件
+
+Kuboard 相关配置文件位于 `manifests/kuboard/` 目录：
+
+| 文件 | 说明 |
+|------|------|
+| `kuboard-v3.yaml` | 主配置文件，包含 Deployment、Service、ConfigMap 等 |
+| `kuboard-v3-swr.yaml` | SWR 版本镜像配置 |
+| `kuboard-ingress.yaml` | Ingress 配置 |
+
+**常用配置项**（修改 `kuboard-v3.yaml` 中的 ConfigMap）：
+
+```yaml
+KUBOARD_SERVER_NODE_PORT: '30083'       # Web 端口
+KUBOARD_AGENT_SERVER_UDP_PORT: '30084'  # Agent UDP 端口
+KUBOARD_AGENT_SERVER_TCP_PORT: '30084'  # Agent TCP 端口
+KUBOARD_AGENT_KEY: 'your-secret-key'    # Agent 通信密钥
+KUBOARD_DISABLE_AUDIT: 'false'          # 是否禁用审计
 ```
 
 ##### 访问信息
 
-- **Docker 方式地址**: http://kuboard.local:30083
-- **K8s 方式地址**: http://kuboard.local
+| 访问方式 | 地址 |
+|----------|------|
+| Ingress | http://kuboard.local |
+| NodePort | http://`<节点IP>`:30083 |
+
 - **默认账号**: admin
 - **默认密码**: Kuboard123
 - **用途**: Kubernetes 可视化管理、Workload 管理、存储管理、权限管理等
 
 ##### 首次使用配置
 
-**第一步：添加 K8s 集群**
+**第一步：导入集群**
 
 1. 打开浏览器访问 Kuboard
 2. 使用默认账号密码登录
 3. 点击「添加集群」或「导入集群」
-4. 选择连接方式：
-
-   **方式一：直接连接（K8s 方式安装时）**
-   - 选择「直接连接」
-   - 输入集群名称，如 `k3s-cluster`
-   - 获取集群信息：
-     ```bash
-     # 获取 kubeconfig
-     cat ~/.kube/config
-     ```
-   - 将 kubeconfig 内容粘贴到 Kuboard
-
-   **方式二：通过 Agent 连接（Docker 方式安装时）**
-   - 选择「通过 Agent 连接」
-   - 在服务器上执行提供的命令，例如：
-     ```bash
-     docker exec kuboard kuboard-agent add-cluster
-     ```
-   - 按照提示完成集群导入
+4. 选择「直接连接」方式
+5. 获取集群信息：
+   ```bash
+   cat ~/.kube/config
+   ```
+6. 按照提示完成集群导入
 
 **第二步：配置命名空间权限**
 
