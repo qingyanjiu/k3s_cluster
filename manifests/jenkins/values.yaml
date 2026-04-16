@@ -1,0 +1,38 @@
+controller:
+  imagePullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+  persistence:
+    storageClass: nfs-storage
+    size: 10Gi
+
+  admin:
+    user: admin
+    password: admin123
+
+  javaOpts: "-Djenkins.install.runSetupWizard=false"
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: jenkins.local
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+
+agent:
+  enabled: true
+
+installPlugins:
+  - kubernetes
+  - workflow-aggregator
+  - git
+  - configuration-as-code
+  - blueocean
+  - docker-workflow

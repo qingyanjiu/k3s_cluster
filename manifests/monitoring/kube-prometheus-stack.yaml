@@ -1,0 +1,22 @@
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-storage
+          resources:
+            requests:
+              storage: 10Gi
+
+grafana:
+  adminPassword: admin123
+  persistence:
+    enabled: true
+    storageClassName: nfs-storage
+    size: 5Gi
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local

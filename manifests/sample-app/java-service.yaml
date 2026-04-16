@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-backend
+  namespace: sample-app
+  labels:
+    app: java-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-backend
+  template:
+    metadata:
+      labels:
+        app: java-backend
+    spec:
+      containers:
+      - name: java-backend
+        image: openjdk:17-slim
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-backend
+  namespace: sample-app
+spec:
+  selector:
+    app: java-backend
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
