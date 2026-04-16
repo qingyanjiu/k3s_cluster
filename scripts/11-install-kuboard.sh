@@ -83,8 +83,8 @@ else
     docker run -d \
       --restart=unless-stopped \
       --name kuboard \
-      -p 30080:80/tcp \
-      -p 30081:30081/udp \
+      -p 30083:80/tcp \
+      -p 30084:30081/udp \
       -e TZ="Asia/Shanghai" \
       -e KUBOARD_SHELL_ROOT_PASSWORD=Kuboard123 \
       -e KUBOARD_SSO_DEFAULT_PASSWORD=Kuboard123 \

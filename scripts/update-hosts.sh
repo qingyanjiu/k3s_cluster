@@ -14,6 +14,7 @@ $SERVER_IP  argocd.local
 $SERVER_IP  grafana.local
 $SERVER_IP  prometheus.local
 $SERVER_IP  app.local
+127.0.0.1  kuboard.local
 EOF
 
 echo "hosts 配置已更新"

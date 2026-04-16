@@ -222,7 +222,7 @@ bash scripts/update-hosts.sh 192.168.0.122
 | **Jenkins** | http://jenkins.local | admin | admin123 | CI/CD 流水线 |
 | **ArgoCD** | https://argocd.local | admin | (见下方) | GitOps 交付 |
 | **Grafana** | http://grafana.local | admin | admin123 | 监控可视化 |
-| **Kuboard** | http://kuboard.local:30080 | admin | Kuboard123 | K8s 可视化管理 |
+| **Kuboard** | http://kuboard.local:30083 | admin | Kuboard123 | K8s 可视化管理 |
 | **示例应用** | http://app.local | - | - | Vue 前端演示 |
 
 ### 各服务详细说明
@@ -271,7 +271,7 @@ bash scripts/update-hosts.sh 192.168.0.122
 
 | 方式 | 安装命令 | 访问地址 | 说明 |
 |------|----------|----------|------|
-| Docker | `bash 11-install-kuboard.sh docker` | http://kuboard.local:30080 | 独立容器，推荐用于测试/开发 |
+| Docker | `bash 11-install-kuboard.sh docker` | http://kuboard.local:30083 | 独立容器，推荐用于测试/开发 |
 | K8s | `bash 11-install-kuboard.sh k8s` | http://kuboard.local | 部署在集群中，适合生产环境 |
 
 ```bash
@@ -284,7 +284,7 @@ bash 11-install-kuboard.sh k8s
 
 ##### 访问信息
 
-- **Docker 方式地址**: http://kuboard.local:30080
+- **Docker 方式地址**: http://kuboard.local:30083
 - **K8s 方式地址**: http://kuboard.local
 - **默认账号**: admin
 - **默认密码**: Kuboard123
